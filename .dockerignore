@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+**/.git
+**/node_modules
+**/.next
+**/.medusa
+**/.turbo
+**/.cache
+**/__tests__
+**/tests
+**/*.log
+**/*.tsbuildinfo
+*.zip
+source-manifest.json
+PACKAGE_CHECK.json

@@ -1,0 +1,2 @@
+import {OperationalDetail} from "@/components/OperationalDetail"
+export default async function Page({params}:{params:Promise<{id:string}>}){const {id}=await params;return <OperationalDetail resource="promotions" id={id}/>}

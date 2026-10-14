@@ -1,0 +1,24 @@
+FROM node:22-alpine AS build
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+ARG APP
+ARG STOREFRONT_URL
+ARG MEDUSA_PUBLIC_URL
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_STOREFRONT_URL=$STOREFRONT_URL
+ENV NEXT_PUBLIC_MEDUSA_URL=$MEDUSA_PUBLIC_URL
+COPY ${APP}/package.json ${APP}/package-lock.json ./
+RUN npm ci --include=dev
+COPY ${APP}/ ./
+RUN npm run build
+
+FROM node:22-alpine
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
+COPY --from=build --chown=node:node /app/.next ./.next
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json /app/next.config.ts /app/tsconfig.json ./
+COPY --from=build /app/public ./public
+USER node
+CMD ["npm", "run", "start"]

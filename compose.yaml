@@ -1,0 +1,131 @@
+name: siteyfy-production
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medusa
+      POSTGRES_USER: medusa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U medusa -d medusa"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: [redis-server, --appendonly, "yes", --requirepass, "${REDIS_PASSWORD:?Set REDIS_PASSWORD}"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH=$$REDIS_PASSWORD redis-cli ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  medusa:
+    build:
+      context: .
+      dockerfile: Dockerfile.medusa
+      args:
+        MEDUSA_PUBLIC_URL: https://${MEDUSA_DOMAIN:?Set MEDUSA_DOMAIN}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "9000"
+      DATABASE_URL: postgres://medusa:${POSTGRES_PASSWORD}@postgres:5432/medusa
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET:?Set COOKIE_SECRET}
+      STORE_CORS: https://${STOREFRONT_DOMAIN}
+      ADMIN_CORS: https://${ADMIN_DOMAIN},https://${MEDUSA_DOMAIN}
+      AUTH_CORS: https://${STOREFRONT_DOMAIN},https://${ADMIN_DOMAIN},https://${MEDUSA_DOMAIN}
+      MEDUSA_PUBLIC_URL: https://${MEDUSA_DOMAIN}
+      MEDUSA_BACKEND_URL: https://${MEDUSA_DOMAIN}
+      DOCLOROO_PUBLIC_URL: https://${STOREFRONT_DOMAIN}
+      DOCLOROO_TRACKING_SECRET: ${DOCLOROO_TRACKING_SECRET:?Set tracking secret}
+      DOCLOROO_DEVELOPMENT_TEST: "false"
+      DOCLOROO_LOCAL_QA: "false"
+      DOCLOROO_INTERNAL_QA: "false"
+      DOCLOROO_MAIL_SINK: "false"
+      DOCLOROO_CHECKOUT_VERIFIED: ${DOCLOROO_CHECKOUT_VERIFIED:-false}
+      DOCLOROO_PRODUCTION_LAUNCH_APPROVED: ${DOCLOROO_PRODUCTION_LAUNCH_APPROVED:-false}
+      DOCLOROO_MAIL_ENABLED: ${DOCLOROO_MAIL_ENABLED:-false}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_FROM: ${SMTP_FROM:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    volumes: [medusa-uploads:/app/apps/backend/static]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 15
+
+  storefront:
+    build:
+      context: .
+      dockerfile: Dockerfile.next
+      args:
+        APP: storefront
+        STOREFRONT_URL: https://${STOREFRONT_DOMAIN}
+        MEDUSA_PUBLIC_URL: https://${MEDUSA_DOMAIN}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOCAL_HTTP: "false"
+      MEDUSA_INTERNAL_URL: http://medusa:9000
+      MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY:-}
+      DOCLOROO_DEVELOPMENT_TEST: "false"
+      DOCLOROO_PRODUCTION_LAUNCH_APPROVED: ${DOCLOROO_PRODUCTION_LAUNCH_APPROVED:-false}
+    depends_on:
+      medusa: {condition: service_healthy}
+
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.next
+      args:
+        APP: admin
+        STOREFRONT_URL: https://${STOREFRONT_DOMAIN}
+        MEDUSA_PUBLIC_URL: https://${MEDUSA_DOMAIN}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      LOCAL_HTTP: "false"
+      MEDUSA_URL: http://medusa:9000
+    depends_on:
+      medusa: {condition: service_healthy}
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      STOREFRONT_DOMAIN: ${STOREFRONT_DOMAIN:?Set STOREFRONT_DOMAIN}
+      ADMIN_DOMAIN: ${ADMIN_DOMAIN:?Set ADMIN_DOMAIN}
+      MEDUSA_DOMAIN: ${MEDUSA_DOMAIN:?Set MEDUSA_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [storefront, admin, medusa]
+
+volumes:
+  postgres-data:
+  redis-data:
+  medusa-uploads:
+  caddy-data:
+  caddy-config:

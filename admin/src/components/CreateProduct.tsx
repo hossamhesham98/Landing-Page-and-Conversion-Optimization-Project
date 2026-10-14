@@ -1,0 +1,9 @@
+"use client"
+import {useState} from "react"
+import {useRouter} from "next/navigation"
+import {adminFetch} from "./Data"
+export function CreateProduct(){
+ const router=useRouter(),[title,setTitle]=useState(""),[description,setDescription]=useState(""),[design,setDesign]=useState(""),[sku,setSku]=useState(""),[price,setPrice]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false)
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");try{const r=await adminFetch<{product:{id:string}}>("products",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({title,description,status:"draft",metadata:{brand:"DoCloroo",kind:"coloring_blanket",inventory_pending:true,design_approval_pending:true},options:[{title:"التصميم",values:[design]}],variants:[{title:design,sku,manage_inventory:true,allow_backorder:false,options:{"التصميم":design},prices:[{currency_code:"egp",amount:Number(price)}],metadata:{active:true}}]})});router.push(`/products/${r.product.id}`)}catch(e){setError(String(e))}finally{setBusy(false)}}
+ return <div className="page-flow"><h1>Create product in Medusa</h1><p>Saved as Draft with managed inventory. No stock quantity is assumed.</p><form className="panel editor-card" onSubmit={submit}>{[{label:"Product title",value:title,set:setTitle},{label:"Description",value:description,set:setDescription},{label:"First design name",value:design,set:setDesign},{label:"Unique SKU",value:sku,set:setSku}].map(f=><div className="form-group" key={f.label}><label>{f.label}</label><input required value={f.value} onChange={e=>f.set(e.target.value)}/></div>)}<div className="form-group"><label>EGP price per piece</label><input required type="number" min="0.01" step="0.01" value={price} onChange={e=>setPrice(e.target.value)}/></div>{error&&<p className="error-box" role="alert">{error}</p>}<button className="btn btn-primary" disabled={busy}>Create draft product</button></form></div>
+}

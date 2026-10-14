@@ -1,0 +1,15 @@
+{
+ email {$ACME_EMAIL}
+}
+
+{$STOREFRONT_DOMAIN} {
+ reverse_proxy storefront:3000
+}
+
+{$ADMIN_DOMAIN} {
+ reverse_proxy admin:3001
+}
+
+{$MEDUSA_DOMAIN} {
+ reverse_proxy medusa:9000
+}

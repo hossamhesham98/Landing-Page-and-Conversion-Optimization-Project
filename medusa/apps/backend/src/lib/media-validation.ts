@@ -1,0 +1,3 @@
+import {MedusaError} from "@medusajs/framework/utils"
+export function validImage(mime:string,data:Buffer){return (mime==="image/png"&&data[0]===137&&data.subarray(1,4).toString()==="PNG")||(mime==="image/jpeg"&&data[0]===255&&data[1]===216&&data[2]===255)||(mime==="image/webp"&&data.subarray(0,4).toString()==="RIFF"&&data.subarray(8,12).toString()==="WEBP")}
+export function imageContent(mime:string,content:string){const data=Buffer.from(content,"base64");if(!data.length||data.length>5*1024*1024||!validImage(mime,data))throw new MedusaError(MedusaError.Types.INVALID_DATA,"Invalid review image (PNG, JPEG or WebP, max 5 MB)");return data}

@@ -1,0 +1,13 @@
+{
+  "sources_present": "PASS",
+  "original_sources_unchanged": "PASS",
+  "unrelated_projects_excluded": "PASS",
+  "secrets_git_tests_caches_data_excluded": "PASS",
+  "next_dependency_manifests_match_locks": "PASS",
+  "medusa_version_and_package_manager": "PASS",
+  "production_urls_in_admin": "PASS",
+  "persistent_volumes": "configured",
+  "compose_syntax": "PASS (docker compose --env-file .env.example config --quiet)",
+  "production_build_and_server_deploy": "NOT RUN (as requested)",
+  "linux_next_swc_in_lockfiles": "PASS"
+}
