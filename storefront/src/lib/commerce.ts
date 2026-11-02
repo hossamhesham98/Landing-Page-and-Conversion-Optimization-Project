@@ -1,5 +1,5 @@
 export type CatalogVariant={id:string;medusaId:string;name:string;image:string;price:number;available:number}
-export type Catalog={available:boolean;variants:CatalogVariant[];reason?:string;development?:boolean;title?:string;description?:string}
+export type Catalog={available:boolean;variants:CatalogVariant[];gallery?:{id:string;name:string;image:string}[];reason?:string;development?:boolean;title?:string;description?:string;size?:string;backing?:string;borderMaterial?:string;borderWidthCm?:number}
 export type CartLine={id:string;qty:number;lineId:string;name:string;image:string;price:number;total:number}
 export type Totals={count:number;subtotal:number;discount:number;productsTotal:number;shipping:number;grandTotal:number;rate:number}
 export type Cart={lines:CartLine[];totals:Totals}

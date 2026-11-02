@@ -1,3 +1,4 @@
+import {randomUUID} from "node:crypto"
 import { AbstractNotificationProviderService,MedusaError } from "@medusajs/framework/utils"
 import type { ProviderSendNotificationDTO, ProviderSendNotificationResultsDTO } from "@medusajs/framework/types"
 import nodemailer from "nodemailer"
@@ -14,7 +15,7 @@ export default class DoclorooSmtpProvider extends AbstractNotificationProviderSe
       tls:{rejectUnauthorized:true},connectionTimeout:10000,socketTimeout:15000,logger:false,debug:false})
     try{
       const text=mailText(notification.template,notification.data||{},notification.to)
-      const result=await transporter.sendMail({from:process.env.SMTP_FROM,to:notification.to,...text,disableFileAccess:true,disableUrlAccess:true})
+      const result=await transporter.sendMail({from:process.env.SMTP_FROM,to:notification.to,...text,replyTo:{name:"DoCloroo",address:"info@docloroo.com"},date:new Date(),messageId:`<${randomUUID()}@docloroo.com>`,headers:{"Auto-Submitted":"auto-generated"},disableFileAccess:true,disableUrlAccess:true})
       if(!result.messageId||!result.accepted?.length||result.rejected?.length)throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE,"SMTP did not accept the recipient")
       return {id:result.messageId}
     }catch{throw new MedusaError(MedusaError.Types.UNEXPECTED_STATE,"SMTP delivery failed; notification was not sent")}

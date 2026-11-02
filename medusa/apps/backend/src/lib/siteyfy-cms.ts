@@ -57,15 +57,15 @@ export const DEFAULT_HOME: SiteyfyHome = {
   },
   editorial: {
     about_title:"مش مجرد بطانية... دي مساحة للإبداع!",
-    about_body:"بطانية تلوين DoCloroo بمقاس 130 × 150 سم، فيها رسومات أبيض وأسود وتفاصيل متنوعة. اختار من 3 تصميمات، ومع كل بطانية علبة ألوان علشان تبدأ التلوين.",
+    about_body:"بطانية تلوين DoCloroo بمقاس 170 × 150 سم، فيها رسومات أبيض وأسود وتفاصيل متنوعة. اختار من 3 تصميمات، ومع كل بطانية علبة ألوان علشان تبدأ التلوين.",
     markers_title:"كل بطانية ومعاها علبة ألوان!",
     markers_body:"مش محتاج تختار الألوان كإضافة منفصلة؛ كل بطانية في طلبك معها علبة ألوان مستقلة، والسعر الموضح للمنتج شامل الاتنين.",
     howto_intro:"هنعرض تعليمات الغسيل والكي النهائية بالتفصيل بعد تأكيدها من المنتج.",
     closing_title:"ابدأ تجربة التلوين مع DoCloroo",
-    closing_body:"بطانية 130 × 150 سم والأقلام مرفقة. اختار التصميمات والكمية، وهتشوف الإجمالي والخصم المعتمد من المتجر قبل الشراء.",
+    closing_body:"بطانية 170 × 150 سم والأقلام مرفقة. اختار التصميمات والكمية، وهتشوف الإجمالي والخصم المعتمد من المتجر قبل الشراء.",
   },
   faq: [
-    {question:"مقاس بطانية DoCloroo كام؟",answer:"مقاس البطانية 130 × 150 سم."},
+    {question:"مقاس بطانية DoCloroo كام؟",answer:"مقاس البطانية 170 × 150 سم."},
     {question:"هل الأقلام بتيجي مع البطانية؟",answer:"أيوه، الأقلام مرفقة مع كل بطانية."},
     {question:"هل ممكن أختار أكثر من رسمة في نفس الطلب؟",answer:"أيوه، تقدر تختار تصميمات مختلفة، والخصم بيتحسب على إجمالي عدد البطاطين في السلة."},
     {question:"إمتى ينفع أغسل الألوان وأبدأ من جديد؟",answer:"يمكن غسل الألوان وإعادة التلوين قبل التثبيت بالكي، وفق تعليمات المنتج."},
@@ -78,7 +78,7 @@ export function parseHome(value: unknown): SiteyfyHome {
   if(!result.success)return DEFAULT_HOME
   const data=result.data
   if(data.editorial?.markers_body==="مش محتاج تختار الألوان كإضافة منفصلة؛ كل بطانية في طلبك معها علبة ألوان مستقلة، والسعر 899 جنيه شامل الاتنين.")data.editorial.markers_body=DEFAULT_HOME.editorial!.markers_body
-  if(data.editorial?.closing_body==="بطانية 130 × 150 سم والأقلام مرفقة. اشترِ قطعتين بخصم 10%، أو 3 قطع وأكثر بخصم 20%.")data.editorial.closing_body=DEFAULT_HOME.editorial!.closing_body
+  if(data.editorial?.closing_body==="بطانية 170 × 150 سم والأقلام مرفقة. اشترِ قطعتين بخصم 10%، أو 3 قطع وأكثر بخصم 20%.")data.editorial.closing_body=DEFAULT_HOME.editorial!.closing_body
   return data
 }
 export type HomeRevision = { revision:number; saved_at:string; page:SiteyfyHome }

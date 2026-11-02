@@ -35,5 +35,5 @@ function renderText(section: Exclude<SectionId,"faq"|"reviews">, page: SiteyfyPa
     .replace(/<p>هنعرض تعليمات الغسيل والكي[^<]*<\/p>/,`<p>${safe(content.howto_intro)}</p>`)
   return closing
     .replace(/<h2>ابدأ تجربة التلوين مع DoCloroo<\/h2>/,`<h2>${safe(content.closing_title)}</h2>`)
-    .replace(/<p>بطانية 130 × 150 سم[^<]*<\/p>/,`<p>${safe(content.closing_body)}</p>`)
+    .replace(/<p>بطانية 170 × 150 سم[^<]*<\/p>/,`<p>${safe(content.closing_body)}</p>`)
 }

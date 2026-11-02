@@ -1,0 +1,56 @@
+{
+  "title": "بطانية تلوين DoCloroo",
+  "size": "170 × 150 سم",
+  "backing": "فرو",
+  "border_material": "فرو",
+  "border_width_cm": 1.5,
+  "designs": [
+    {
+      "key": "fun",
+      "name": "أصحاب الحكايات",
+      "unit_price_egp": 899,
+      "image": "/assets/story-friends-studio-20261103.webp"
+    },
+    {
+      "key": "garden",
+      "name": "أبطال البهجة",
+      "unit_price_egp": 899,
+      "image": "/assets/joy-heroes-studio-20261103.webp"
+    },
+    {
+      "key": "space",
+      "name": "كوكب المرح",
+      "unit_price_egp": 899,
+      "image": "/assets/planet-fun-studio-20261103.webp"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "gallery-04",
+      "name": "وقت تلوين مع بعض",
+      "image": "/assets/blanket-gallery-04-20261103.webp"
+    },
+    {
+      "id": "gallery-05",
+      "name": "مساحة للإبداع",
+      "image": "/assets/blanket-gallery-05-20261103.webp"
+    },
+    {
+      "id": "gallery-06",
+      "name": "التلوين في البيت",
+      "image": "/assets/blanket-gallery-06-20261103.webp"
+    },
+    {
+      "id": "gallery-09",
+      "name": "تلوين مع شريكك",
+      "image": "/assets/docloroo-couple-coloring-09-20261103.webp"
+    },
+    {
+      "id": "gallery-14",
+      "name": "المقاس وتفاصيل الفرو",
+      "image": "/assets/blanket-gallery-14-20261103.webp"
+    }
+  ],
+  "markers_image": "/assets/fabric-markers-studio-20261101.webp",
+  "note": "Approved public presentation only. Configure via Medusa/SITEYFY. This file is not a database export, seed, inventory record or automatic CMS import."
+}

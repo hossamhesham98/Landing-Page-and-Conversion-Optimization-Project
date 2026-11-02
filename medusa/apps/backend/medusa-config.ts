@@ -3,8 +3,9 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 module.exports = defineConfig({
-  admin: { backendUrl: process.env.MEDUSA_BACKEND_URL },
+  admin: { backendUrl: process.env.MEDUSA_BACKEND_URL, disable: process.env.DISABLE_MEDUSA_ADMIN === "true" },
   projectConfig: {
+    workerMode: (process.env.MEDUSA_WORKER_MODE || "shared") as "shared" | "server" | "worker",
     databaseUrl: process.env.DATABASE_URL,
     databaseDriverOptions: {
       ssl: false,
@@ -25,6 +26,7 @@ module.exports = defineConfig({
     {resolve:"./src/modules/siteyfy"},
     ...(process.env.REDIS_URL ? [
       {resolve:"@medusajs/medusa/cache-redis",options:{redisUrl:process.env.REDIS_URL}},
+      {resolve:"@medusajs/medusa/workflow-engine-redis",options:{redis:{redisUrl:process.env.REDIS_URL}}},
       {resolve:"@medusajs/medusa/event-bus-redis",options:{redisUrl:process.env.REDIS_URL,jobOptions:{attempts:5,backoff:{type:"exponential",delay:5000},removeOnComplete:{age:86400,count:1000},removeOnFail:{age:604800,count:1000}}}},
       {resolve:"@medusajs/medusa/locking",options:{providers:[{resolve:"@medusajs/medusa/locking-redis",id:"locking-redis",is_default:true,options:{redisUrl:process.env.REDIS_URL}}]}},
     ] : []),

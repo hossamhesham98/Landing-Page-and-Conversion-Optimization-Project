@@ -14,10 +14,10 @@ export default function HomeClient({cms,proof}:{cms:SiteyfyPage;proof:Proof}) {
   const router = useRouter();
   const { addLines, notify, buyNow, catalog, busy, error } = useShop();
   const designs=catalog.variants.length?catalog.variants:VARIANTS;
-  const images=[...designs,{id:"markers",name:"علبة الألوان",image:cms.media?.markers_image??"/assets/markers-studio.webp"}];
+  const images=[...designs,...(catalog.gallery||[]),{id:"markers",name:"علبة ألوان قماش",image:cms.media?.markers_image??"/assets/markers-studio.webp"}];
   const [selected, setSelected] = useState<VariantId>("fun");
   const [photo, setPhoto] = useState<ImageId>("fun");
-  const [picks, setPicks] = useState<Record<VariantId, number>>({fun:1,garden:0,space:0});
+  const [picks, setPicks] = useState<Record<VariantId, number>>({fun:0,garden:0,space:0});
   const [markerRight, setMarkerRight] = useState(0);
   const cardsRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(false);
@@ -56,14 +56,14 @@ export default function HomeClient({cms,proof}:{cms:SiteyfyPage;proof:Proof}) {
         {proof.sold_count !== null ? <div className="sales-proof"><span className="sales-proof-icon">✦</span>أكثر من {proof.sold_count!.toLocaleString("en-US")} قطعة تم بيعها</div> : null}
         <p className="lede">{cms.hero.description}</p>
         <div className="price-row"><div className="price">{firstPrice!==undefined?formatEGP(firstPrice):"السعر غير متاح"}</div><span className="price-includes">شامل البطانية + علبة ألوان</span></div>
-        <div className="mini-perks"><span className="perk">✎ علبة ألوان مع كل بطانية</span><span className="perk">▣ 130 × 150 سم</span><span className="perk">♡ هدية إبداعية</span></div>
-        <div className="bundle-mini"><Image unoptimized src={cms.media?.markers_image??"/assets/markers-studio.webp"} width={47} height={63} alt="علبة أقلام مرفقة"/><div><strong>مع كل بطانية علبة ألوان 🎁</strong><span>بتشتري 3 بطاطين؟ هيوصل معاهم 3 علب ألوان، من غير تكلفة إضافية.</span></div></div>
+        <div className="mini-perks"><span className="perk">✎ علبة ألوان مع كل بطانية</span><span className="perk">▣ {catalog.size||"170 × 150 سم"}</span><span className="perk">♡ هدية إبداعية</span>{catalog.backing&&<span className="perk">ظهر {catalog.backing}</span>}{catalog.borderMaterial&&catalog.borderWidthCm!==undefined&&<span className="perk">فريم {catalog.borderMaterial} حوالي {catalog.borderWidthCm} سم</span>}</div>
+        <div className="bundle-mini"><Image unoptimized src={cms.media?.markers_image??"/assets/markers-studio.webp"} width={64} height={64} alt="علبة ألوان قماش مرفقة — 12 لون"/><div><strong>مع كل بطانية علبة ألوان قماش 🎁</strong><span>بتشتري 3 بطاطين؟ هيوصل معاهم 3 علب ألوان، من غير تكلفة إضافية.</span></div></div>
         <div className="form-divider"/>
-        <div className="form-header"><div className="form-label">اختار رسوماتك وحدد الكمية 🎨</div><div className="form-helper">{catalog.variants.length} تصميمات{firstPrice!==undefined?` • ${formatEGP(firstPrice)} للقطعة`:""}</div></div>
+        <div className="form-header"><div className="form-label">{catalog.available?"اختار رسوماتك وحدد الكمية 🎨":"التصميمات المتاحة للمعاينة 🎨"}</div><div className="form-helper">{designs.length} تصميمات{firstPrice!==undefined?` • ${formatEGP(firstPrice)} للقطعة`:""}</div></div>
         <div className="variant-picks" ref={cardsRef}>
           <span className="moving-marker" aria-hidden="true" style={{right:markerRight}}><svg fill="none" viewBox="0 0 52 58"><path d="M5 9C20 1 35 7 39 13C45 20 34 26 39 32C43 37 51 36 46 44C44 49 38 46 39 40C39 36 35 34 34 28C33 17 29 13 18 13" stroke="#F13677" strokeLinecap="round" strokeLinejoin="round" strokeWidth="7"/><path d="M10 6C15 2 23 2 29 6" stroke="#F25880" strokeLinecap="round" strokeWidth="3"/></svg></span>
           {designs.map(v=><div className={`variant-card ${v.id===selected?"active":""} ${picks[v.id]>0?"has-qty":""}`} key={v.id}>
-            <button className="variant-hit" type="button" onClick={()=>choose(v.id)} aria-pressed={selected===v.id}><Image unoptimized src={v.image} width={190} height={130} alt={`بطانية ${v.name}`}/><div className="variant-name">{v.name}</div><div className="variant-subline">{"price" in v?formatEGP(v.price):"جاري تحميل السعر"}</div></button>
+            <button className="variant-hit" type="button" onClick={()=>choose(v.id)} aria-pressed={selected===v.id}><Image unoptimized src={v.image} width={190} height={130} alt={`بطانية ${v.name}`}/><div className="variant-name">{v.name}</div><div className="variant-subline">{"price" in v?formatEGP(v.price):"السعر قيد الاعتماد"}</div></button>
             <div className="variant-qty-wrap"><div className="qty-stepper"><button type="button" aria-label={`تقليل ${v.name}`} onClick={()=>change(v.id,-1)} disabled={picks[v.id]===0}>−</button><strong>{picks[v.id]??0}</strong><button type="button" aria-label={`زيادة ${v.name}`} onClick={()=>change(v.id,1)} disabled={(picks[v.id]??0)>=(catalog.variants.find(x=>x.id===v.id)?.available??0)}>+</button></div></div>
           </div>)}
         </div>
@@ -81,8 +81,8 @@ export default function HomeClient({cms,proof}:{cms:SiteyfyPage;proof:Proof}) {
         {catalog.development&&<p className="v7-safe">بيئة تطوير محلية — المخزون والصور للاختبار، وليست إتاحة تجارية.</p>}{!catalog.available&&<p className="v7-safe" role="status">{catalog.reason||"البيع غير مفعّل قبل اعتماد التصميمات والمخزون"}</p>}{error&&<p role="alert" className="v7-safe">{error}</p>}<div className="cod-note">✓ الدفع عند الاستلام فقط</div>
       </div>
       <div className="media-col"><div aria-hidden="true" className="doodle-deco doodle-deco-star">✳</div><div aria-hidden="true" className="doodle-deco doodle-deco-loop">〰</div>
-        <div className="main-photo-wrap"><Image unoptimized src={image.image} alt={photo==="markers"?"علبة الألوان المرفقة":`بطانية ${image.name}`} width={900} height={730} className="main-photo" priority/><div className="photo-tag">✎ رسومات مؤقتة للمعاينة</div><button className="zoom-photo" type="button" onClick={()=>setZoom(true)} aria-label="تكبير صورة البطانية">⌕</button><div className="hero-pack-float"><Image unoptimized src={cms.media?.markers_image??"/assets/markers-studio.webp"} alt="علبة ألوان" width={50} height={68}/><span>+ علبة ألوان<br/>مع كل بطانية</span></div></div>
-        <div className="gallery-thumbs">{images.map(x=><button type="button" className={`gallery-thumb ${photo===x.id?'active':''}`} key={x.id} onClick={()=>x.id==='markers'?setPhoto('markers'):choose(x.id as VariantId)}><Image unoptimized src={x.image} alt={x.name} width={140} height={95}/><span>{x.name}</span></button>)}</div>
+        <div className={`main-photo-wrap ${photo!=="markers"?"blanket-photo":""}`}><Image unoptimized src={image.image} alt={photo==="markers"?"علبة ألوان القماش المرفقة — 12 لون":`بطانية ${image.name}`} width={900} height={730} className="main-photo" priority/>{photo==="markers"&&<div className="photo-tag">✎ علبة ألوان قماش مرفقة</div>}<button className="zoom-photo" type="button" onClick={()=>setZoom(true)} aria-label="تكبير صورة البطانية">⌕</button><div className="hero-pack-float"><Image unoptimized src={cms.media?.markers_image??"/assets/markers-studio.webp"} alt="علبة ألوان قماش" width={64} height={64}/><span>+ علبة ألوان<br/>مع كل بطانية</span></div></div>
+        <div className="gallery-thumbs">{images.map(x=><button type="button" className={`gallery-thumb ${photo===x.id?'active':''}`} key={x.id} onClick={()=>designs.some(v=>v.id===x.id)?choose(x.id as VariantId):setPhoto(x.id)}><Image unoptimized src={x.image} alt={x.name} width={140} height={95}/><span>{x.name}</span></button>)}</div>
       </div>
     </section>
     {cms.sections.map(section=><React.Fragment key={section.id}>{section.enabled&&(()=>{
@@ -91,7 +91,7 @@ export default function HomeClient({cms,proof}:{cms:SiteyfyPage;proof:Proof}) {
       return <div key={section.id} dangerouslySetInnerHTML={{__html:renderEditorial(section.id,cms)}}/>
     })()}{(cms.blocks||[]).filter(b=>b.enabled&&b.after===section.id).map(b=><ContentBlock key={b.id} block={b}/>)}</React.Fragment>)}
     {zoom ? <div className="v7-overlay" role="presentation" onClick={()=>setZoom(false)} style={{display:'grid',placeItems:'center',zIndex:90,cursor:'zoom-out'}}><Image unoptimized src={image.image} alt={image.name} width={1050} height={850} style={{maxWidth:'94vw',maxHeight:'90vh',objectFit:'contain'}}/></div> : null}
-    <div className="mobile-sticky"><div className="mobile-sticky-price"><strong>{quote&&count?formatEGP(totals.productsTotal):firstPrice!==undefined?formatEGP(firstPrice):"جاري تحميل السعر"}</strong><span>{count>1?`${count} بطاطين من اختيارك`:'بطانية + علبة ألوان'}</span></div><button type="button" className="btn btn-primary" onClick={()=>void buy()} disabled={busy||!catalog.available}>اشترِ الآن ←</button></div>
+    <div className="mobile-sticky"><div className="mobile-sticky-price"><strong>{quote&&count?formatEGP(totals.productsTotal):firstPrice!==undefined?formatEGP(firstPrice):"السعر قيد الاعتماد"}</strong><span>{count>1?`${count} بطاطين من اختيارك`:'بطانية + علبة ألوان'}</span></div><button type="button" className="btn btn-primary" onClick={()=>void buy()} disabled={busy||!catalog.available}>اشترِ الآن ←</button></div>
   </main>;
 }
 

@@ -3,9 +3,9 @@ export const SHIPPING = 70;
 export const VERIFIED_SALES_COUNT: number | null = null; // Set only from user's verified historic sales.
 export const VERIFIED_REVIEWS: { name: string; stars: number; comment: string; image?: string }[] = [];
 export const VARIANTS = [
-  { id: "fun", name: "عالم المرح", image: "/assets/fun-doodles.webp" },
-  { id: "garden", name: "حديقة الأحلام", image: "/assets/dream-garden.webp" },
-  { id: "space", name: "مغامرة الفضاء", image: "/assets/space-adventure.webp" },
+  { id: "fun", name: "أصحاب الحكايات", image: "/assets/story-friends-studio-20261103.webp" },
+  { id: "garden", name: "أبطال البهجة", image: "/assets/joy-heroes-studio-20261103.webp" },
+  { id: "space", name: "كوكب المرح", image: "/assets/planet-fun-studio-20261103.webp" },
 ] as const;
 export type VariantId = string;
 export type Line = { id: VariantId; qty: number };

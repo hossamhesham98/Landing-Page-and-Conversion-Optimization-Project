@@ -1,5 +1,6 @@
 import {cookies} from "next/headers"
 import {NextRequest,NextResponse} from "next/server"
+import {safeMediaUrl} from "@/lib/siteyfy-content"
 import {emptyCart} from "@/lib/commerce"
 export const runtime="nodejs"
 const cartCookie="docloroo_cart"
@@ -23,7 +24,8 @@ async function catalog(){
  const development=process.env.DOCLOROO_DEVELOPMENT_TEST==="true"&&product?.metadata?.development_test===true
  if(!product||(!development&&(product.metadata?.inventory_pending===true||product.metadata?.design_approval_pending===true||product.metadata?.development_test===true)))return {available:false,variants:[],reason:"البيع غير متاح لحين اعتماد التصميمات والمخزون"}
  const variants=(product.variants||[]).filter((v:any)=>v.metadata?.active!==false).map((v:any)=>({id:String(v.metadata?.design_key||v.id),medusaId:v.id,name:v.title,image:v.thumbnail||v.metadata?.image||product.thumbnail,price:number(v.calculated_price?.calculated_amount),available:v.manage_inventory&&!v.allow_backorder?Math.max(0,number(v.inventory_quantity)):0}))
- return {available:variants.some((v:any)=>v.available>0&&v.price>0),variants,development,title:product.title,description:product.description}
+ const gallery=(Array.isArray(product.metadata?.gallery_images)?product.metadata.gallery_images:[]).filter((x:any)=>typeof x?.id==="string"&&/^gallery-[a-z0-9-]+$/.test(x.id)&&typeof x.name==="string"&&x.name.length<=120&&typeof x.image==="string"&&safeMediaUrl(x.image)).slice(0,12).map((x:any)=>({id:x.id,name:x.name,image:x.image}))
+ return {gallery,available:variants.some((v:any)=>v.available>0&&v.price>0),variants,development,title:product.title,description:product.description,size:typeof product.metadata?.size==="string"?product.metadata.size:undefined,backing:typeof product.metadata?.backing==="string"?product.metadata.backing:undefined,borderMaterial:typeof product.metadata?.border_material==="string"?product.metadata.border_material:undefined,borderWidthCm:typeof product.metadata?.border_width_cm==="number"?product.metadata.border_width_cm:undefined}
 }
 function publicCart(cart:any){
  const subtotal=number(cart.item_subtotal),discount=number(cart.item_discount_total),productsTotal=number(cart.item_total),shipping=number(cart.shipping_total)

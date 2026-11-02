@@ -6,12 +6,13 @@ FROM base AS build
 RUN apk add --no-cache python3 make g++
 COPY medusa/package.json medusa/pnpm-lock.yaml medusa/pnpm-workspace.yaml medusa/.npmrc ./
 COPY medusa/apps/backend/package.json ./apps/backend/package.json
-RUN pnpm install --frozen-lockfile --filter @dtc/backend... --fetch-retries=5 \
+RUN pnpm install --network-concurrency=8 --frozen-lockfile --filter @dtc/backend... --fetch-retries=5 \
     && pnpm --filter @dtc/backend exec node -e 'require("@swc/core")'
 COPY medusa/ ./
 ARG MEDUSA_PUBLIC_URL
 ENV MEDUSA_BACKEND_URL=$MEDUSA_PUBLIC_URL MEDUSA_PUBLIC_URL=$MEDUSA_PUBLIC_URL
 WORKDIR /app/apps/backend
+ENV NODE_OPTIONS=--max-old-space-size=2560 MEDUSA_TELEMETRY_DISABLED=1
 RUN pnpm run build && test -f .medusa/server/medusa-config.js
 
 FROM base
