@@ -52,4 +52,4 @@ Project files, assets, and the final video will be uploaded to Google Drive upon
 
 https://drive.google.com/drive/folders/1hVvQzGrlm4G_MtGyXBRmz-khzhUd17N8?usp=sharing
 landing page
-doctor.com
+www.docloroo.com
